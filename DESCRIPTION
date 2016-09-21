@@ -1,0 +1,11 @@
+Package: rcloud.htmlwidgets
+Title: Html Widgets in RCloud
+Version: 1.0.0
+Author: Gábor Csárdi <gcsardi@mango-solutions.com>
+Maintainer: Gábor Csárdi <gcsardi@mango-solutions.com>
+Description: Embed HTML widgets in RCloud notebooks. This is a support
+    package that makes sure that HTML widgets work in RCloud, the usual
+    way, by simply printing a widget object.
+Imports: rcloud.support, htmlwidgets (>= 0.7), htmltools (>= 0.3.5)
+License: MIT + file LICENSE
+Encoding: UTF-8

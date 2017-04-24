@@ -47,7 +47,7 @@ function size_this(div, reset) {
 }
 
 function resize_all(reset) {
-    var widgets = $('.rcloud-htmlwidget').find('div');
+    var widgets = $('.rcloud-htmlwidget-content');
     $.map(
         widgets,
         function(w) {

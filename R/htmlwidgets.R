@@ -202,12 +202,18 @@ as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   )
 
   if (ocaps) htmlwidgets.install.ocap()
-
+  
+  where <- paste0("rc_htmlwidget_content_", as.integer(runif(1)*1e6))
+  
   paste(
     sep = "",
+    "<div class=\"rcloud-htmlwidget-content\" id=\"",
+    where,
+    "\">",
     "<iframe frameBorder=\"0\" width=\"100%\" height=\"400\" srcdoc=\"",
     gsub("\"", "&quot;", paste(html, collapse = "\n")),
-    "\"></iframe>"
+    "\"></iframe>",
+    "</div>"
   )
 }
 

@@ -33,11 +33,12 @@
 ## # In mini.html
 ##
 ## Mini is a bit different. Here is an example, it is also at
-## https://gist.github.com/gaborcsardi/63b8a334e3596724ec9bc1c16744b4c3
+## https://gist.github.com/gordonwoodhull/fc9220160fb8819edb1c6e972d874305
 ##
 ##     library(rcloud.web)
 ##     library(rcloud.support)
 ##     library(DT)
+##     library(rcloud.htmlwidgets)
 ##
 ##     out("Data set:")
 ##     oselection(

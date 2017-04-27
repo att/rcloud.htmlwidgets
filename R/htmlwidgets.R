@@ -198,7 +198,7 @@ as.character.shiny.tag <- function(x, ocaps = TRUE, ...) {
   build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
 }
 
-build.html <- function(content = list(body=NULL, head = NULL, dependencies = list()), ocaps = FALSE) {
+build.html <- function(content = list(body = NULL, head = NULL, dependencies = list()), ocaps = TRUE) {
   background <- "white"
   html <- c(
     "<!DOCTYPE html>", "<html>", "<head>", "<meta charset=\"utf-8\"/>",

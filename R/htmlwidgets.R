@@ -184,23 +184,33 @@ htmlwidgets.install.ocap <- function() {
 }
 
 as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
-
   html <- htmlwidgets:::toHTML(x, standalone = TRUE)
   deps <- lapply(htmltools::htmlDependencies(html), rcloudHTMLDependency)
   rendered <- htmltools::renderTags(html)
+  
+  build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
+}
 
+as.character.shiny.tag <- function(x, ocaps = TRUE, ...) {
+  rendered <- htmltools::renderTags(x)
+  deps <- lapply(rendered$dependencies, rcloudHTMLDependency)
+  
+  build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
+}
+
+build.html <- function(content = list(body=NULL, head = NULL, dependencies = list()), ocaps = FALSE) {
   background <- "white"
   html <- c(
     "<!DOCTYPE html>", "<html>", "<head>", "<meta charset=\"utf-8\"/>",
-    htmltools::renderDependencies(deps, "href"),
-    rendered$head, "</head>",
+    htmltools::renderDependencies(content$dependencies, "href"),
+    content$head, "</head>",
     sprintf(
       "<body style=\"background-color:%s;\">",
       htmltools::htmlEscape(background)
     ),
-    rendered$html, "</body>", "</html>"
+    content$body, "</body>", "</html>"
   )
-
+  
   if (ocaps) htmlwidgets.install.ocap()
   
   where <- paste0("rc_htmlwidget_content_", as.integer(runif(1)*1e6))
@@ -236,6 +246,8 @@ print.htmlwidget <- function(x, ..., view = interactive()) {
 }
 
 print.suppress_viewer <- print.htmlwidget
+
+print.shiny.tag <- print.htmlwidget
 
 rcloudHTMLDependency <- function(dep) {
 

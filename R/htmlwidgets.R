@@ -250,6 +250,24 @@ print.suppress_viewer <- print.htmlwidget
 
 print.shiny.tag <- print.htmlwidget
 
+print.facet_trelliscope <- function(x, ..., view = interactive()) {
+  attrs <- attr(x, "trelliscope")
+  attrs$self_contained = TRUE
+  attr(x, "trelliscope") <- attrs
+  
+  invisible(trelliscopejs:::print.facet_trelliscope(x))
+}
+
+trelliscope.data.frame <- function(x, name, group = "common", desc = "",
+                                   md_desc = "", path = NULL, height = 500, width = 500, auto_cog = TRUE, state = NULL,
+                                   nrow = 1, ncol = 1, jsonp = TRUE, self_contained = TRUE, thumb = TRUE) {
+  trelliscopejs:::trelliscope.data.frame(x, name, group = group, desc = desc, md_desc = md_desc, path = path, 
+                                                   height = height, width = width, auto_cog = auto_cog, state = state, 
+                                                   nrow = nrow, ncol = ncol, jsonp = jsonp, self_contained = self_contained, 
+                                                   thumb = thumb)
+}
+
+
 rcloudHTMLDependency <- function(dep) {
 
   file <- dep$src$file

@@ -192,11 +192,23 @@ as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
 }
 
-as.character.shiny.tag <- function(x, ocaps = TRUE, ...) {
-  rendered <- htmltools::renderTags(x)
-  deps <- lapply(rendered$dependencies, rcloudHTMLDependency)
+#'
+#' @param ocaps should OCAP be installed
+#' @param rcloud_htmlwidgets_print flag indicating that the 'as.character' method was invoked
+#'  from a print method overriden by rcloud.htmlwidgets. If this parameter is FALSE, the default as.character 
+#'  method from 'htmltools' package is invoked.
+#'  This parameter ensures that the code relying on the original as.character implementation is not broken by
+#'  this implementation.
+#' 
+as.character.shiny.tag <- function(x, ocaps = TRUE, rcloud_htmlwidgets_print = FALSE,  ...) {
+  if(!rcloud_htmlwidgets_print) {
+     htmltools:::as.character.shiny.tag(x, ...)
+  } else {
+    rendered <- htmltools::renderTags(x)
+    deps <- lapply(rendered$dependencies, rcloudHTMLDependency)
   
-  build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
+    build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
+  }
 }
 
 build.html <- function(content = list(body = NULL, head = NULL, dependencies = list()), ocaps = TRUE) {
@@ -237,7 +249,7 @@ print.htmlwidget <- function(x, ..., view = interactive()) {
     "</div>"))
   where <- paste0("#", where)
 
-  widget <- as.character(x, ..., ocaps = FALSE)
+  widget <- as.character(x, ..., ocaps = FALSE, rcloud_htmlwidgets_print = TRUE)
 
   ocaps <- htmlwidgets.install.ocap()
 

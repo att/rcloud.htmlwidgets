@@ -273,7 +273,7 @@ rcloudHTMLDependency <- function(dep) {
   } else if (c_rel_path[2] == "htmlwidgets") {
     dep$src$href <- paste0("/shared.R/_htmlwidgets/", pkg, "/", pkgpath)
 
-  } else if (c_rel_path[2] == "www") {
+  } else if (c_rel_path[2] %in% c("www", "lib")) {
     dep$src$href <- paste0("/shared.R/", pkg, "/", pkgpath)
   }
 

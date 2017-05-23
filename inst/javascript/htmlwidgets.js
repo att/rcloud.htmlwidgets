@@ -29,7 +29,7 @@ function size_this(div, reset) {
     if (!div.id) {
         // Do nothing if the div is not there at all
 
-    } else if (!D || !D.body) {
+    } else if (!D || !D.body || !Di.is('visible')) {
         setTimeout(function() { size_this(div, reset); }, 100);
 
     } else {
@@ -37,7 +37,7 @@ function size_this(div, reset) {
         // we don't need to do anything.
         var rcid = div.id;
         var width = $(div).find('iframe').width();
-        if (reset || (! rcid in lastWidths) || (lastWidths[rcid] != width)) {
+        if (reset || !(rcid in lastWidths) || (lastWidths[rcid] != width)) {
             var h = getDocHeight(Di);
             $(div).find('iframe').height(h);
             $(div).find('iframe').attr('height', h);

@@ -1,3 +1,6 @@
+## 1.0.3
+* do not resize widgets until they are displayed (#18)
+
 ## 1.0.2
 * look in `lib/` as well as `www/` of package dependencies, for plotly 4.6 etc.
 * also print htmltools-tagged stuff (`shiny.tag`) in same way as htmlwidgets, for compatibility with

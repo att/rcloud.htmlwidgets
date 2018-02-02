@@ -1,3 +1,6 @@
+## 1.0.4
+* do not attempt to expand NULL files in dependencies (these usually have hrefs instead). (#22 / #23)
+
 ## 1.0.3
 * do not resize widgets until they are displayed (#18)
 

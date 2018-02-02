@@ -265,28 +265,28 @@ print.shiny.tag <- print.htmlwidget
 rcloudHTMLDependency <- function(dep) {
 
   file <- dep$src$file
+  if(!is.null(file)) {
+    lib <- where_in_path(file, .libPaths())
+    if (is.na(lib)) {
+      warning("Cannot find htmlwidgets dependency: ", file)
+      return(dep)
+    }
 
-  lib <- where_in_path(file, .libPaths())
-  if (is.na(lib)) {
-    warning("Cannot find htmlwidgets dependency: ", file)
-    return(dep)
-  }
+    rel_path <- path_inside(file, lib)
+    c_rel_path <- path_components(rel_path)
+    pkg <- c_rel_path[1]
 
-  rel_path <- path_inside(file, lib)
-  c_rel_path <- path_components(rel_path)
-  pkg <- c_rel_path[1]
+    ## strip off pkg/www or pkg/htmlwidgets
+    pkgpath <- paste(tail(c_rel_path, -2), collapse = "/")
 
-  ## strip off pkg/www or pkg/htmlwidgets
-  pkgpath <- paste(tail(c_rel_path, -2), collapse = "/")
-
-  if (length(c_rel_path) < 2) {
-    warning("Invalid htmlwidgets dependency path: ", file)
-    return(dep)
-  } else if (c_rel_path[2] == "htmlwidgets") {
-    dep$src$href <- paste0("/shared.R/_htmlwidgets/", pkg, "/", pkgpath)
-
-  } else if (c_rel_path[2] %in% c("www", "lib")) {
-    dep$src$href <- paste0("/shared.R/", pkg, "/", pkgpath)
+    if (length(c_rel_path) < 2) {
+      warning("Invalid htmlwidgets dependency path: ", file)
+      return(dep)
+    } else if (c_rel_path[2] == "htmlwidgets") {
+      dep$src$href <- paste0("/shared.R/_htmlwidgets/", pkg, "/", pkgpath)
+    } else if (c_rel_path[2] %in% c("www", "lib")) {
+      dep$src$href <- paste0("/shared.R/", pkg, "/", pkgpath)
+    }
   }
 
   dep

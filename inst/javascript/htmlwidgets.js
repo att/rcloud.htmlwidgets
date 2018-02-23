@@ -51,7 +51,7 @@ function resize_all(reset) {
     $.map(
         widgets,
         function(w) {
-            setTimeout(function() { size_this(w, reset) }, 200)
+            setTimeout(function() { size_this(w, reset) }, 200);
         }
     );
 
@@ -64,7 +64,7 @@ function add_hooks() {
     if (!hooks) {
         hooks = true;
         window.addEventListener('resize', resize_all, true);
-    };
+    }
 }
 
 // The resizer is mainly for mini.html, but might be handy for
@@ -73,7 +73,7 @@ function add_hooks() {
 var lastWidth = window.innerWidth;
 
 $(document).ready(function() {
-    add_hooks()
+    add_hooks();
     function resizer(reset) {
         var num_widgets = resize_all(reset);
         var interval = 200;
@@ -88,16 +88,27 @@ $(document).ready(function() {
 });
 
 function initWidget(div, html, k) {
-    $(div).html(html)
-
-    setTimeout(function() { size_this($(div), true); }, 100);
-    k(null, div);
+  var MAX_ATTEMPTS = 6000; // Enough attempts to avoid potential failures in slow environments
+  var wait_till_ready = function(attempt) {
+    if($(div).length > 0) {
+      $(div).html(html);
+      setTimeout(function() { size_this($(div), true); }, 100);
+    } else {
+      if(attempt < MAX_ATTEMPTS) {
+        setTimeout(wait_till_ready, 10, attempt+1);
+      } else {
+        console.error('Expected div ' + div + ' to hold htmlwidget content was not found!');
+      }
+    }
+  };
+  setTimeout(wait_till_ready, 10, 0);
+  k(null, div);
 }
 
 (function() {
     return {
         create: function(div, html, k) {
-            initWidget(div, html, k)
+            initWidget(div, html, k);
         }
-    }
-})()
+    };
+})();

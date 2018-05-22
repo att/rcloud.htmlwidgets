@@ -1,8 +1,13 @@
 
 importFrom("utils", "packageName")
+importFrom("trelliscopejs", "trelliscope")
 export(print.htmlwidget)
 export(print.suppress_viewer)
 export(print.shiny.tag)
+export(print.facet_trelliscope)
+export(trelliscope.data.frame)
+S3method(print,facet_trelliscope)
+S3method(trelliscope,data.frame)
 S3method(print, shiny.tag)
 S3method(as.character, shiny.tag)
 S3method(print, htmlwidget)

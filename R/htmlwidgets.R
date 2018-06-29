@@ -184,6 +184,7 @@ htmlwidgets.install.ocap <- function() {
   .htmlwidgets.cache$ocaps
 }
 
+## this is ours and a new method - no hacks neede here (until they define theirs ;))
 as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   html <- htmlwidgets:::toHTML(x, standalone = TRUE)
   deps <- lapply(htmltools::htmlDependencies(html), rcloudHTMLDependency)
@@ -191,6 +192,10 @@ as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   
   build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
 }
+
+## htmltoos does have as.character() mehtods
+
+.htmltools.as.character.shiny.tag <- htmltools:::as.character.shiny.tag
 
 #'
 #' @param ocaps should OCAP be installed
@@ -202,7 +207,7 @@ as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
 #' 
 as.character.shiny.tag <- function(x, ocaps = TRUE, rcloud_htmlwidgets_print = FALSE,  ...) {
   if(!rcloud_htmlwidgets_print) {
-     htmltools:::as.character.shiny.tag(x, ...)
+     .htmltools.as.character.shiny.tag(x, ...)
   } else {
     rendered <- htmltools::renderTags(x)
     deps <- lapply(rendered$dependencies, rcloudHTMLDependency)
@@ -261,6 +266,23 @@ print.htmlwidget <- function(x, ..., view = interactive()) {
 print.suppress_viewer <- print.htmlwidget
 
 print.shiny.tag <- print.htmlwidget
+
+## this is a hack for R 3.5.0+ which prevents us from
+## overriding methods in htmlwidgets/htmltools
+.replace.methods <- function() if ((R.version$major == "3" && R.version$minor >= "5") || R.version$major > "3") {
+  .doit <- function(namespace, sym.list) {
+    e <- getNamespace(namespace)
+    o <- environment(.replace.methods)
+    for (i in sym.list) {
+      unlockBinding(i, e)
+      e[[i]] <- o[[i]]
+      lockBinding(i, e)
+    }
+  }
+  .doit("htmlwidgets", c("print.suppress_viewer", "print.htmlwidget"))
+  .doit("htmltools", "as.character.shiny.tag")
+  TRUE
+}
 
 rcloudHTMLDependency <- function(dep) {
 
@@ -325,3 +347,6 @@ path_inside <- function(path, parent) {
 
   paste(tail(c_path, -length(c_parent)), collapse = "/")
 }
+
+.onLoad <- function(libname, pkgname)
+  .replace.methods()

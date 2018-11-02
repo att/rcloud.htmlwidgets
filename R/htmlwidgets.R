@@ -259,7 +259,7 @@ print.htmlwidget <- function(x, ..., view = interactive()) {
 
   ocaps <- htmlwidgets.install.ocap()
 
-  ocaps$create(Rserve.context(), where, widget)
+  ocaps$create(where, widget)
 
   invisible(x)
 }

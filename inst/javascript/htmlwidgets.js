@@ -51,7 +51,7 @@ function resize_all(reset) {
     $.map(
         widgets,
         function(w) {
-            setTimeout(function() { size_this(w, reset) }, 200)
+            setTimeout(function() { size_this(w, reset) }, 200);
         }
     );
 
@@ -64,7 +64,14 @@ function add_hooks() {
     if (!hooks) {
         hooks = true;
         window.addEventListener('resize', resize_all, true);
-    };
+    }
+}
+
+
+// Schedules execution of a function within cell result processing loop to ensure that any UI element referenes used in the function
+// were added to the result pane.
+function executeInCellResultProcessingQueue(context_id, fun) {
+  RCloud.session.invoke_context_callback('function_call', context_id, fun);
 }
 
 // The resizer is mainly for mini.html, but might be handy for
@@ -73,7 +80,7 @@ function add_hooks() {
 var lastWidth = window.innerWidth;
 
 $(document).ready(function() {
-    add_hooks()
+    add_hooks();
     function resizer(reset) {
         var num_widgets = resize_all(reset);
         var interval = 200;
@@ -87,17 +94,32 @@ $(document).ready(function() {
     lastWidth = window.innerWidth;
 });
 
-function initWidget(div, html, k) {
-    $(div).html(html)
-
-    setTimeout(function() { size_this($(div), true); }, 100);
-    k(null, div);
+function handleError(err, k) {
+  if(err.name) {
+    k({type: err.name, message: err.message}, null);
+  } else {
+    k({type: 'error', message: err}, null);
+  }
 }
 
 (function() {
     return {
-        create: function(div, html, k) {
-            initWidget(div, html, k)
+        create: function(context_id, div, html, k) {
+          try {
+            executeInCellResultProcessingQueue(context_id, 
+            function(result_div) {
+              try {
+                $(div).html(html);
+            
+                setTimeout(function() { size_this($(div), true); }, 100);
+                k(null, div);
+              } catch(err) {
+                handleError(err, k);
+              }
+            });
+          } catch (err) {
+            handleError(err, k);
+          }
         }
-    }
+    };
 })()

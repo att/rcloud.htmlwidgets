@@ -1,3 +1,6 @@
+## 1.0.6
+* support htmltools package+relative path dependencies
+
 ## 1.0.5
 * hack to support R 3.5.4 which stopped us from overriding methods in htmlwidgets & htmltools
 

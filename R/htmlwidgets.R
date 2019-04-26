@@ -1,4 +1,3 @@
-
 ## Some comments about how htmlwidgets work in Rcloud.
 ##
 ## # In the notebook
@@ -292,16 +291,20 @@ print.shiny.tag <- function(x, ..., view = interactive()) {
 }
 
 rcloudHTMLDependency <- function(dep) {
-
   file <- dep$src$file
   if(!is.null(file)) {
-    lib <- where_in_path(file, .libPaths())
-    if (is.na(lib)) {
-      warning("Cannot find htmlwidgets dependency: ", file)
-      return(dep)
+    package <- dep$package
+    if(!is.null(package)) {
+      lib <- where_in_path(find.package(package), .libPaths())
+      rel_path <- paste0(package, '/', file)
+    } else {
+      lib <- where_in_path(file, .libPaths())
+      if (is.na(lib)) {
+        warning("Cannot find htmlwidgets dependency: ", file)
+        return(dep)
+      }
+      rel_path <- path_inside(file, lib)
     }
-
-    rel_path <- path_inside(file, lib)
     c_rel_path <- path_components(rel_path)
     pkg <- c_rel_path[1]
 

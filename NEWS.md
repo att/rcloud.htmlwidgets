@@ -1,3 +1,7 @@
+## 1.1.0
+* more efficient embedding in RCloud cells
+* support for displaying without iframe
+
 ## 1.0.6
 * support htmltools package+relative path dependencies
 

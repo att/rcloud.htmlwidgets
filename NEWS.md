@@ -1,3 +1,6 @@
+## 1.0.5
+* hack to support R 3.5.4 which stopped us from overriding methods in htmlwidgets & htmltools
+
 ## 1.0.4
 * do not attempt to expand NULL files in dependencies (these usually have hrefs instead). (#22 / #23)
 

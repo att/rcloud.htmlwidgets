@@ -186,7 +186,9 @@ htmlwidgets.install.ocap <- function() {
 ## this is ours and a new method - no hacks neede here (until they define theirs ;))
 as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   html <- htmlwidgets:::toHTML(x, standalone = TRUE)
-  deps <- lapply(htmltools::htmlDependencies(html), rcloudHTMLDependency)
+  deps <- htmltools::htmlDependencies(html)
+  deps <- htmltools::resolveDependencies(deps)
+  deps <- lapply(deps, rcloudHTMLDependency)
   rendered <- htmltools::renderTags(html)
   
   build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)

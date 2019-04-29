@@ -313,17 +313,30 @@ rcloudHTMLDependency <- function(dep) {
     ## strip off pkg/www or pkg/htmlwidgets
     pkgpath <- paste(tail(c_rel_path, -2), collapse = "/")
 
+    user <- is_user_lib(lib)
+    parts <- NULL
     if (length(c_rel_path) < 2) {
       warning("Invalid htmlwidgets dependency path: ", file)
       return(dep)
     } else if (c_rel_path[2] == "htmlwidgets") {
-      dep$src$href <- paste0("/shared.R/_htmlwidgets/", pkg, "/", pkgpath)
+      parts <- c('/shared.R', '_htmlwidgets')
+      if(!is.null(user)) parts = c(parts, user)
+      parts <- c(parts, pkg, pkgpath)
     } else if (c_rel_path[2] %in% c("www", "lib")) {
-      dep$src$href <- paste0("/shared.R/", pkg, "/", pkgpath)
+      parts <- c('/shared.R')
+      if(!is.null(user)) parts = c(parts, user)
+      parts <- c(parts, pkg, pkgpath)
     }
+    if(!is.null(parts))
+      dep$src$href <- paste0(parts, collapse='/')
   }
 
   dep
+}
+
+is_user_lib <- function(path) {
+    found <- gsub(rcloud.home('library', user='([a-z_][a-z0-9_]*)'), '\\1', path) 
+    if(found == path) NULL else found
 }
 
 where_in_path <- function(path, parents) {

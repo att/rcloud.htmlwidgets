@@ -1,3 +1,10 @@
+## 1.1.1
+* merges user library support from 1.0.8
+
+## 1.1.0
+* more efficient embedding in RCloud cells
+* support for displaying without iframe
+
 ## 1.0.8
 * detect user library paths and produce corresponding `shared.R` URLs
 

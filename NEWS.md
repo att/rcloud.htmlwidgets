@@ -1,6 +1,5 @@
-## 1.1.0
-* more efficient embedding in RCloud cells
-* support for displaying without iframe
+## 1.0.8
+* detect user library paths and produce corresponding `shared.R` URLs
 
 ## 1.0.7
 * call resolveDependencies in order to remove redundant dependencies. (DT was broken because of multiple jQuery)

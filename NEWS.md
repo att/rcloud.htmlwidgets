@@ -1,3 +1,10 @@
+## 1.1.0
+* more efficient embedding in RCloud cells
+* support for displaying without iframe
+
+## 1.0.7
+* call resolveDependencies in order to remove redundant dependencies. (DT was broken because of multiple jQuery)
+
 ## 1.0.6
 * support htmltools package+relative path dependencies
 

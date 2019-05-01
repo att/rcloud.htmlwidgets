@@ -186,7 +186,9 @@ htmlwidgets.install.ocap <- function() {
 ## this is ours and a new method - no hacks neede here (until they define theirs ;))
 as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
   html <- htmlwidgets:::toHTML(x, standalone = TRUE)
-  deps <- lapply(htmltools::htmlDependencies(html), rcloudHTMLDependency)
+  deps <- htmltools::htmlDependencies(html)
+  deps <- htmltools::resolveDependencies(deps)
+  deps <- lapply(deps, rcloudHTMLDependency)
   rendered <- htmltools::renderTags(html)
   
   build.html(list(body = rendered$html, head = rendered$head, dependencies = deps), ocaps)
@@ -205,8 +207,9 @@ as.character.htmlwidget <- function(x, ocaps = TRUE, ...) {
 #'  this implementation.
 #' 
 as.character.shiny.tag <- function(x, ocaps = TRUE, rcloud_htmlwidgets_print = FALSE,  ...) {
-  if(!rcloud_htmlwidgets_print) {
-     .htmltools.as.character.shiny.tag(x, ...)
+  if( ! rcloud_htmlwidgets_print || 
+     (('attribs' %in% names(x)) && 'data-rcloud-htmlwidgets-compact' %in% names(x$attribs))) {
+    .htmltools.as.character.shiny.tag(x, ...)
   } else {
     rendered <- htmltools::renderTags(x)
     deps <- lapply(rendered$dependencies, rcloudHTMLDependency)
@@ -257,14 +260,20 @@ print.htmlwidget <- function(x, ..., view = interactive()) {
 
   ocaps <- htmlwidgets.install.ocap()
 
-  ocaps$create(where, widget)
+  ocaps$create(Rserve.context(), where, widget)
 
   invisible(x)
 }
 
 print.suppress_viewer <- print.htmlwidget
 
-print.shiny.tag <- print.htmlwidget
+print.shiny.tag <- function(x, ..., view = interactive()) {
+  if('attribs' %in% names(x) && 'data-rcloud-htmlwidgets-compact' %in% names(x$attribs)) {
+    rcloud.html.out(as.character.shiny.tag(x, ...))
+  } else {
+    invisible(print.htmlwidget(x, ..., view = view))
+  }
+}
 
 ## this is a hack for R 3.5.0+ which prevents us from
 ## overriding methods in htmlwidgets/htmltools
@@ -279,7 +288,7 @@ print.shiny.tag <- print.htmlwidget
     }
   }
   .doit("htmlwidgets", c("print.suppress_viewer", "print.htmlwidget"))
-  .doit("htmltools", "as.character.shiny.tag")
+  .doit("htmltools", c("as.character.shiny.tag", "print.shiny.tag"))
   TRUE
 }
 

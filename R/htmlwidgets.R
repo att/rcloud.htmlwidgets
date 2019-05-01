@@ -295,35 +295,61 @@ print.shiny.tag <- function(x, ..., view = interactive()) {
 rcloudHTMLDependency <- function(dep) {
   file <- dep$src$file
   if(!is.null(file)) {
+    # htmltools dependencies can be either file='absolute' or package='foo',file='relative'
+    # we want to know:
+    # * package name
+    # * is this a user library, from the current user's .libPath() or from lib.loc?
+    # * top directory within package - shared.R currently allow htmlwidgets, www, and lib
+    # * rest of file path
     package <- dep$package
     if(!is.null(package)) {
-      lib <- where_in_path(find.package(package), .libPaths())
+      pkgpath <- getNamespaceInfo(package, 'path')
+      user <- is_user_lib(pkgpath)
       rel_path <- paste0(package, '/', file)
     } else {
-      lib <- where_in_path(file, .libPaths())
-      if (is.na(lib)) {
-        warning("Cannot find htmlwidgets dependency: ", file)
-        return(dep)
+      user <- is_user_lib(file)
+      if(!is.null(user)) {
+        rel_path <- path_inside(file, rcloud.home('library', user=user))
+      } else {
+        lib <- where_in_path(file, .libPaths())
+        if (is.na(lib)) {
+          warning("Cannot find htmlwidgets dependency: ", file)
+          return(dep)
+        }
+        rel_path <- path_inside(file, lib)
       }
-      rel_path <- path_inside(file, lib)
     }
     c_rel_path <- path_components(rel_path)
-    pkg <- c_rel_path[1]
+    package <- c_rel_path[1]
 
-    ## strip off pkg/www or pkg/htmlwidgets
-    pkgpath <- paste(tail(c_rel_path, -2), collapse = "/")
+    ## strip off package/www or package/htmlwidgets
+    filepath <- paste(tail(c_rel_path, -2), collapse = "/")
 
+    parts <- NULL
     if (length(c_rel_path) < 2) {
       warning("Invalid htmlwidgets dependency path: ", file)
       return(dep)
     } else if (c_rel_path[2] == "htmlwidgets") {
-      dep$src$href <- paste0("/shared.R/_htmlwidgets/", pkg, "/", pkgpath)
+      parts <- c('/shared.R', '_htmlwidgets')
+      if(!is.null(user)) parts = c(parts, user)
+      parts <- c(parts, package, filepath)
     } else if (c_rel_path[2] %in% c("www", "lib")) {
-      dep$src$href <- paste0("/shared.R/", pkg, "/", pkgpath)
+      parts <- c('/shared.R')
+      if(!is.null(user)) parts = c(parts, user)
+      parts <- c(parts, package, filepath)
+    } else {
+      warning("Invalid package subdirectory: ", c_rel_path[2])
     }
+    if(!is.null(parts))
+      dep$src$href <- paste0(parts, collapse='/')
   }
 
   dep
+}
+
+is_user_lib <- function(path) {
+    found <- gsub(rcloud.home('library.*', user='([^/]*)'), '\\1', path)
+    if(found == path) NULL else found
 }
 
 where_in_path <- function(path, parents) {

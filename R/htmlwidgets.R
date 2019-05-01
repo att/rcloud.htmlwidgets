@@ -348,7 +348,7 @@ rcloudHTMLDependency <- function(dep) {
 }
 
 is_user_lib <- function(path) {
-    found <- gsub(rcloud.home('library', user='([^/]*)'), '\\1', path) 
+    found <- gsub(rcloud.home('library.*', user='([^/]*)'), '\\1', path)
     if(found == path) NULL else found
 }
 
